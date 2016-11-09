@@ -30,6 +30,8 @@ web:
   cmd: ./archon.sh
   port: 9000
   memory: 256m
+  secret_files:
+    - config
 
 web.console:
   cmd: ./entry.sh
@@ -42,6 +44,10 @@ web.console:
   logs:
     - console_log
     - console_op
+  persistent_dirs:
+    - /lain/app/logs
+  secret_files:
+    - config
 
 notify:
   slack: "#lain"
