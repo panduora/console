@@ -5,6 +5,7 @@ build:
   prepare:
     version: "20161215"
     script:
+      - yum install -y epel-release
       - yum install -y gcc-c++
       - git clone --depth=1 https://github.com/golang/sys.git $GOPATH/src/golang.org/x/sys
       - git clone --depth=1 https://github.com/golang/net.git $GOPATH/src/golang.org/x/net
@@ -16,6 +17,7 @@ build:
       - touch /sbin/modprobe && chmod +x /sbin/modprobe
       - pip install -r pip-req.txt
   script:
+    - cd $(npm root -g)/npm && npm install fs-extra && sed -i -e s/graceful-fs/fs-extra/ -e s/fs\.rename/fs.move/ ./lib/utils/rename.js # fix npm error
     - cd $GOPATH/src/github.com/laincloud/archon && git pull && gobuildweb dist && cp archon-0.1.zip /lain/app/ # note docker may use cache, you should delete the old image
     - unzip -o /lain/app/archon-0.1.zip
     - pip install -r pip-req.txt
@@ -30,6 +32,8 @@ web:
   cmd: ./archon.sh
   port: 9000
   memory: 256m
+  secret_files:
+    - config
 
 web.console:
   cmd: ./entry.sh
@@ -42,6 +46,8 @@ web.console:
   logs:
     - console_log
     - console_op
+  secret_files:
+    - config
 
 notify:
   slack: "#lain"
