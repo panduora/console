@@ -16,7 +16,6 @@ from os import environ
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
@@ -30,12 +29,14 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 # If you want to use sentry, set the sentry dsn here
+DSN = environ.get(
+    'CONSOLE_SENTRY_DSN', 'http://s9dc9s02kd:32j30df9dk3d9sdw@sentry.domain/1'
+)
 RAVEN_CONFIG = {
-    'dsn': 'http://s9dc9s02kd:32j30df9dk3d9sdw@sentry.domain/1',
+    'dsn': DSN,
 }
 
 INSTALLED_APPS = (
@@ -48,9 +49,7 @@ INSTALLED_APPS = (
 
     # for sentry
     'raven.contrib.django.raven_compat',
-
     'markdown_deux',
-
     'apis',
     'deploys',
 )
@@ -90,21 +89,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'console.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.mysql',
-#        'NAME': environ.get("CONSOLE_DB_NAME", "lainconsole"),
-#        'USER': environ.get("CONSOLE_DB_USER", "lainconsole"),
-#        'PASSWORD': environ.get("CONSOLE_DB_PASSWORD", "lainconsole"),
-#        'HOST': environ.get("CONSOLE_DB_HOST", "127.0.0.1"),
-#        'PORT': int(environ.get("CONSOLE_DB_PORT", 3306),)
-#    }
+    #    'default': {
+    #        'ENGINE': 'django.db.backends.mysql',
+    #        'NAME': environ.get("CONSOLE_DB_NAME", "lainconsole"),
+    #        'USER': environ.get("CONSOLE_DB_USER", "lainconsole"),
+    #        'PASSWORD': environ.get("CONSOLE_DB_PASSWORD", "lainconsole"),
+    #        'HOST': environ.get("CONSOLE_DB_HOST", "127.0.0.1"),
+    #        'PORT': int(environ.get("CONSOLE_DB_PORT", 3306),)
+    #    }
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
