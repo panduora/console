@@ -25,4 +25,4 @@ pylint==1.4.4
 pyjwt==1.4.0
 netaddr==0.7.18
 raven==5.13.0
--e git+https://github.com/laincloud/lain-sdk.git#egg=lain_sdk
+-e git+https://github.com/ein-plus/lain-sdk.git@1e9841199dad3e4cb0048015af72a067c3fcbed6#egg=lain_sdk
