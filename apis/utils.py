@@ -180,7 +180,8 @@ class CalicoException(Exception):
 
 def docker_network_exists(name):
     cli = get_docker_client(DOCKER_BASE_URL)
-    if len(cli.networks(names=[name])) == 0:
+    filter_name = '^%s$' % name
+    if len(cli.networks(names=[filter_name])) == 0:
         return False
     else:
         return True
