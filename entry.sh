@@ -12,4 +12,4 @@ export CONSOLE_APISERVER="http://deployd.lain:9003"
 export CONSOLE_SENTRY_DSN=$console_sentry_dsn
 
 mkdir -p /lain/logs
-exec gunicorn -w 3 -b 0.0.0.0:8000 --max-requests=100 --preload --error-logfile /lain/logs/error.log --access-logfile /lain/logs/access.log console.wsgi 
+exec gunicorn -w 3 -b 0.0.0.0:8000 --max-requests=100 --timeout=240 --preload --error-logfile /lain/logs/error.log --access-logfile /lain/logs/access.log console.wsgi 
