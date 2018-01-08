@@ -80,7 +80,8 @@ def add_calico_profile_for_app(calico_profile):
 
 
 def get_docker_client(docker_base_url):
-    return Client(base_url=docker_base_url)
+    # FIXME: `docker network ls` takes too long, increase timeout temporarily
+    return Client(base_url=docker_base_url, timeout=100)
 
 
 def normalize_meta_version(meta_version):
