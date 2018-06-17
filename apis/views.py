@@ -394,7 +394,6 @@ class AppApi:
 
             logger.info("update metaversion to %s" % meta_version)
             if app.get_app_type() != AppType.Resource:
-                app.add_calico_profile()
                 success, msg = AuthApi.create_resource_instance_group(
                     token, app.appname)
                 if not success:
@@ -441,7 +440,6 @@ class AppApi:
                 resource.appname, resource.meta_version)
             resource_instance.meta = resource.get_resource_instance_meta(
                 app.appname, resource_props['context'])
-            resource_instance.add_calico_profile()
 
             ConfigApi.construct_config_for_instance(
                 token, resource, resource_instance)

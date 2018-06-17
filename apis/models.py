@@ -15,10 +15,6 @@ from .specs import (
     AppType,
 )
 from .utils import (
-    docker_network_exists,
-    docker_network_remove,
-    calicoctl_profile_rule_op,
-    add_calico_profile_for_app,
     get_domains,
 )
 from commons.settings import (
@@ -44,23 +40,6 @@ class App(BaseApp):
     @property
     def docker_network(self):
         return self.appname
-
-    @property
-    def calico_profile(self):
-        return self.appname
-
-    def add_calico_profile(self):
-        '''
-        - calicoctl profile add self.appname
-        - calicoctl profile self.appname rules update (adding allow from admin)
-        '''
-        if add_calico_profile_for_app(self.calico_profile):
-            calicoctl_profile_rule_op(
-                self.calico_profile, "add inbound allow from tag lain --at=1")
-
-    def remove_calico_profile(self):
-        if docker_network_exists(self.docker_network):
-            docker_network_remove(self.docker_network)
 
     @property
     def app_status(self):
@@ -522,20 +501,6 @@ class App(BaseApp):
                     (podgroup_name, self.appname))
         return self.default_deploy.remove_podgroup(podgroup_name)
 
-    def dependency_register(self, service_app, service_appname, dependency_pod_name):
-        # service may not been deployed yet, so may need force generate the
-        # calico profile of service_profile
-        service_app_profile = service_appname
-        add_calico_profile_for_app(service_app_profile)
-
-        client_app_profile = self.calico_profile
-        portal_profile = "%s_%s" % (dependency_pod_name, self.appname)
-        if add_calico_profile_for_app(portal_profile):
-            calicoctl_profile_rule_op(
-                portal_profile, "add inbound allow from tag %s --at=1" % client_app_profile)
-            calicoctl_profile_rule_op(
-                service_app_profile, "add inbound allow from tag %s --at=1" % portal_profile)
-
     def dependency_remove(self, dependency_pod_name):
         return self.default_deploy.remove_dependency(dependency_pod_name)
 
@@ -560,9 +525,6 @@ def recursive_deploy(podgroup_spec):
             portal_name = App.get_portal_name_from_service_name(
                 service_app, procname)
             portal_pod_name = "%s.portal.%s" % (service_appname, portal_name)
-            # TODO check portal.allow(client procname)
-            app.dependency_register(
-                service_app, service_appname, portal_pod_name)
 
     resources = app.lain_config.use_resources
     for resourcename, resource_props in resources.iteritems():
@@ -574,9 +536,6 @@ def recursive_deploy(podgroup_spec):
                 instance_app, procname)
             portal_pod_name = "%s.portal.%s" % (
                 instance_app.appname, portal_name)
-            # TODO check portal.allow(client procname)
-            app.dependency_register(
-                instance_app, instance_app.appname, portal_pod_name)
 
     results = {
         'services_need_deploy': services_need_deploy,
