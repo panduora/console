@@ -3,7 +3,6 @@
 import yaml
 import json
 import collections
-from etcd import EtcdKeyNotFound
 from .specs import render_app_spec, AppType
 from lain_sdk.yaml.parser import ProcType, LainConf
 from commons.settings import PRIVATE_REGISTRY
@@ -12,6 +11,7 @@ from .utils import (
     search_images_from_registry,
     get_meta_from_registry,
     read_from_etcd,
+    keys_from_etcd,
     delete_from_etcd,
     set_value_to_etcd,
     get_meta_version_from_tag,
@@ -101,24 +101,17 @@ class BaseApp:
 
     @classmethod
     def get(cls, appname):
-        try:
-            etcd_r = read_from_etcd(cls.etcd_app_key(appname))
-            if etcd_r.dir:
-                raise InvalidStoreData("Store Data should not be dir")
-        except EtcdKeyNotFound, e:
-            raise DoesNotExist(e)
-        return cls.render_app_from_etcd_value(etcd_r.value)  # pylint: disable=E1103
+        etcd_r = read_from_etcd(cls.etcd_app_key(appname))
+        if etcd_r is None:
+            raise DoesNotExist()
+        return cls.render_app_from_etcd_value(etcd_r)  # pylint: disable=E1103
 
     @classmethod
     def all(cls):
-        try:
-            apps_root_r = read_from_etcd(cls.ETCD_PREFIX)
-        except EtcdKeyNotFound, e:
-            logger.warn("call App.all() fail: %s" % e)
-            return []
         apps = []
-        for l in apps_root_r.leaves:
-            appname = l.key[len(cls.ETCD_PREFIX) + 1:]  # FIXME: ugly
+        apps_root_r = keys_from_etcd(cls.ETCD_PREFIX)
+        for key, _ in apps_root_r:
+            appname = key[len(cls.ETCD_PREFIX) + 1:]  # FIXME: ugly
             try:
                 app = cls.get(appname)
                 apps.append(app)

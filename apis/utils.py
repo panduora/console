@@ -23,6 +23,10 @@ def read_from_etcd(key):
     return commons.utils.read_from_etcd(key, ETCD_AUTHORITY)
 
 
+def keys_from_etcd(key):
+    return commons.utils.keys_from_etcd(key, ETCD_AUTHORITY)
+
+
 def set_value_to_etcd(key, value):
     return commons.utils.set_value_to_etcd(key, value, ETCD_AUTHORITY)
 
